@@ -1,0 +1,44 @@
+version: '3.5'
+
+services:
+
+    api:
+        build: .
+        container_name: knobtream-local-api
+        volumes:
+            - ./:/app
+        ports:
+            - "2715:80"
+
+
+    pgsql:
+        image: postgres:12.4
+        container_name: knobtream-local-pgsql
+        volumes:
+            - knobtream-local-db:/var/lib/postgresql/data
+        environment:
+            TZ: "Europe/Kiev"
+            PGTZ: "Europe/Kiev"
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        ports:
+          - "5415:5432"
+
+    redis:
+        container_name: knobtream-local-redis
+        image: redis:5.0
+        volumes:
+            - knobtream-local-redis:/data
+
+
+networks:
+    default:
+        name: knobtream-local
+        driver: bridge
+
+volumes:
+    knobtream-local-db:
+        driver: local
+    knobtream-local-redis:
+        driver: local
