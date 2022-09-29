@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\JobCatalogController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,8 +17,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
+Route::get('/catalog', [JobCatalogController::class, 'index']);
+Route::get('/catalog/show/{id}', [JobCatalogController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', [AuthController::class, 'user']);
+    Route::post('/catalog/job', [JobCatalogController::class, 'create']);
+    Route::put('/catalog/job/{id}', [JobCatalogController::class, 'update']);
+    Route::delete('/catalog/job/{id}', [JobCatalogController::class, 'delete']);
+    Route::get('/catalog/user-jobs', [JobCatalogController::class, 'userJobList']);
     Route::get('/auth/logout', [AuthController::class, 'logout']);
 });
