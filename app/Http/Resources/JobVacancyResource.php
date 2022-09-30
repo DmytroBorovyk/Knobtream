@@ -17,6 +17,7 @@ use OpenApi\Annotations as OA;
  *              ref="#/components/schemas/JobVacancyResponseResource",
  *          )
  *     ),
+ *     @OA\Property(property="likes", type="integer", example=5),
  *  )
  *
  * @property JobVacancy $resource
@@ -31,7 +32,10 @@ class JobVacancyResource extends  JsonResource
             'description' => $this->resource->description,
             'response_count' => $this->resource->response_count,
             'owner' => new UserResource($this->whenLoaded('owner')),
-            'responses' => JobVacancyResponseResource::collection($this->whenLoaded('responses'))
+            'responses' => JobVacancyResponseResource::collection($this->whenLoaded('responses')),
+            'likes' => $this->whenLoaded('likes', function() {
+                return $this->likes->count();
+            }),
         ];
     }
 }

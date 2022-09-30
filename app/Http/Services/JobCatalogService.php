@@ -16,11 +16,11 @@ class JobCatalogService
     public function index(Request $request): AnonymousResourceCollection
     {
         if ($request->orderBy) {
-            $vacancies = JobVacancy::with('owner')
+            $vacancies = JobVacancy::with(['owner', 'likes'])
                 ->orderBy($request->orderBy, $request->orderWay ?: 'ASC')
                 ->paginate(20);
         } else {
-            $vacancies = JobVacancy::with('owner')->paginate(20);
+            $vacancies = JobVacancy::with(['owner', 'likes'])->paginate(20);
         }
 
         return JobVacancyResource::collection($vacancies);
@@ -28,7 +28,7 @@ class JobCatalogService
 
     public function show(string $id): JobVacancyResource
     {
-        $vacancy = JobVacancy::with(['owner', 'responses'])->findOrFail($id);
+        $vacancy = JobVacancy::with(['owner', 'responses', 'likes'])->findOrFail($id);
 
         return new JobVacancyResource($vacancy);
     }

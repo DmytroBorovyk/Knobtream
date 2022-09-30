@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\Services\JobCatalogService;
 use App\Http\Services\JobResponseService;
+use App\Http\Services\LikeService;
 use Carbon\Laravel\ServiceProvider;
 
 class CatalogServiceProvider extends ServiceProvider
@@ -20,6 +21,10 @@ class CatalogServiceProvider extends ServiceProvider
 
         $this->app->bind(JobResponseService::class, function () {
             return new JobResponseService();
+        });
+
+        $this->app->bind(LikeService::class, function () {
+            return new LikeService();
         });
     }
 }

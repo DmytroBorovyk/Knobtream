@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JobCatalogController;
 use App\Http\Controllers\JobVacancyResponseController;
+use App\Http\Controllers\LikeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,6 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('{id}', [JobVacancyResponseController::class, 'delete']);
         Route::get('user-responses', [JobVacancyResponseController::class, 'userResponsesList']);
     });
+    Route::post('/like-toggle', [LikeController::class, 'like']);
+    Route::get('/liked-jobs', [LikeController::class, 'getLikedJobs']);
+    Route::get('/liked-users', [LikeController::class, 'getLikedUsers']);
 
     Route::get('/auth/logout', [AuthController::class, 'logout']);
 });

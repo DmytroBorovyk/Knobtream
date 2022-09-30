@@ -54,4 +54,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(JobVacancyResponse::class, 'user_id');
     }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class, 'user_id');
+    }
 }
