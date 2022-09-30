@@ -121,9 +121,9 @@ class JobCatalogController extends Controller
     }
 
     /**
-     *  @OA\Schema( schema="JobDoesNotBelongsToUserResponse",
+     *  @OA\Schema( schema="ItemDoesNotBelongsToUserResponse",
      *      @OA\Property(property="status", type="boolean", example=false),
-     *      @OA\Property(property="token", type="string", example="This job does not belong to user"),
+     *      @OA\Property(property="token", type="string", example="This item does not belong to user"),
      *  )
      * @OA\Put(
      *      path="/api/catalog/job/{id}",
@@ -163,7 +163,7 @@ class JobCatalogController extends Controller
      *          description="Job does not belong to user",
      *          @OA\JsonContent(
      *              type="object",
-     *              ref="#/components/schemas/JobDoesNotBelongsToUserResponse"
+     *              ref="#/components/schemas/ItemDoesNotBelongsToUserResponse"
      *          )
      *      ),
      *      @OA\Response(
@@ -182,7 +182,7 @@ class JobCatalogController extends Controller
     }
 
     /**
-     *  @OA\Schema( schema="JobDeletedResponse",
+     *  @OA\Schema( schema="ItemDeletedResponse",
      *      @OA\Property(property="status", type="boolean", example=true),
      *      @OA\Property(property="token", type="string", example="deleted"),
      *  )
@@ -204,7 +204,7 @@ class JobCatalogController extends Controller
      *          description="Successful operation",
      *          @OA\JsonContent(
      *              type="object",
-     *              ref="#/components/schemas/JobDeletedResponse"
+     *              ref="#/components/schemas/ItemDeletedResponse"
      *          )
      *      ),
      *      @OA\Response(
@@ -220,7 +220,7 @@ class JobCatalogController extends Controller
      *          description="Job does not belong to user",
      *          @OA\JsonContent(
      *              type="object",
-     *              ref="#/components/schemas/JobDoesNotBelongsToUserResponse"
+     *              ref="#/components/schemas/ItemDoesNotBelongsToUserResponse"
      *          )
      *      ),
      *      @OA\Response(
