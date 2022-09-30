@@ -35,23 +35,33 @@ class JobCatalogService
 
     public function create(JobOperationRequest $request): JobVacancyResource|Response
     {
-        $vacancies_day_count = JobVacancy::withTrashed()
-            ->whereDate('created_at', Carbon::today())
-            ->where('user_id', Auth::user()->getKey())
-            ->count();
+        if (Auth::user()->balance - 2 >= 0) {
+            $vacancies_day_count = JobVacancy::withTrashed()
+                ->whereDate('created_at', Carbon::today())
+                ->where('user_id', Auth::user()->getKey())
+                ->count();
 
-        if ($vacancies_day_count < 2) {
-            $vacancy = new JobVacancy();
-            $vacancy->fill($request->validated());
-            $vacancy->user_id = Auth::user()->getKey();
-            $vacancy->save();
+            if ($vacancies_day_count < 2) {
+                $vacancy = new JobVacancy();
+                $vacancy->fill($request->validated());
+                $vacancy->user_id = Auth::user()->getKey();
+                $vacancy->save();
 
-            return new JobVacancyResource($vacancy);
+                Auth::user()->balance -= 2;
+                Auth::user()->save();
+
+                return new JobVacancyResource($vacancy);
+            }
+
+            return response()->json([
+                'status' => false,
+                'message' => 'User already created 2 vacancies for today',
+            ], 400);
         }
 
         return response()->json([
             'status' => false,
-            'message' => 'User already created 2 vacancies for today',
+            'message' => 'Not enough coins',
         ], 400);
     }
 

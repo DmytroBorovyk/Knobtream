@@ -28,26 +28,36 @@ class JobResponseService
 
     public function create(ResponseOperationRequest $request): JobVacancyResponseResource|Response
     {
-        $created_responses = JobVacancyResponse::where('job_id', $request->job_id)
-            ->where('user_id', Auth::user()->getKey())
-            ->count();
+        if (Auth::user()->balance - 1 >= 0) {
+            $created_responses = JobVacancyResponse::where('job_id', $request->job_id)
+                ->where('user_id', Auth::user()->getKey())
+                ->count();
 
-        if ($created_responses === 0) {
-            $response = new JobVacancyResponse();
-            $response->fill($request->validated());
-            $response->user_id = Auth::user()->getKey();
-            $response->save();
+            if ($created_responses === 0) {
+                $response = new JobVacancyResponse();
+                $response->fill($request->validated());
+                $response->user_id = Auth::user()->getKey();
+                $response->save();
 
-            $vacancy = JobVacancy::findOrFail($request->job_id);
-            $vacancy->response_count++;
-            $vacancy->save();
+                $vacancy = JobVacancy::findOrFail($request->job_id);
+                $vacancy->response_count++;
+                $vacancy->save();
 
-            return new JobVacancyResponseResource($response);
+                Auth::user()->balance -= 1;
+                Auth::user()->save();
+
+                return new JobVacancyResponseResource($response);
+            }
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Response for this job have been already created',
+            ], 400);
         }
 
         return response()->json([
             'status' => false,
-            'message' => 'Response for this job have been already created',
+            'message' => 'Not enough coins',
         ], 400);
     }
 
