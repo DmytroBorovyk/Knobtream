@@ -27,7 +27,7 @@ class JobCatalogService
 
     public function show(string $id): JobVacancyResource
     {
-        $vacancy = JobVacancy::with(['owner'])->findOrFail($id);
+        $vacancy = JobVacancy::with(['owner', 'responses'])->findOrFail($id);
 
         return new JobVacancyResource($vacancy);
     }
