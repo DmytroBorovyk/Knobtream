@@ -33,20 +33,29 @@ class JobResponseService
                 ->where('user_id', Auth::user()->getKey())
                 ->count();
 
+
             if ($created_responses === 0) {
-                $response = new JobVacancyResponse();
-                $response->fill($request->validated());
-                $response->user_id = Auth::user()->getKey();
-                $response->save();
-
                 $vacancy = JobVacancy::findOrFail($request->job_id);
-                $vacancy->response_count++;
-                $vacancy->save();
+                if ($vacancy->user_id !== Auth::user()->getKey()) {
+                    $response = new JobVacancyResponse();
+                    $response->fill($request->validated());
+                    $response->user_id = Auth::user()->getKey();
+                    $response->save();
 
-                Auth::user()->balance -= 1;
-                Auth::user()->save();
 
-                return new JobVacancyResponseResource($response);
+                    $vacancy->response_count++;
+                    $vacancy->save();
+
+                    Auth::user()->balance -= 1;
+                    Auth::user()->save();
+
+                    return new JobVacancyResponseResource($response);
+                }
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Response for own jobs is unable',
+                ], 400);
             }
 
             return response()->json([
