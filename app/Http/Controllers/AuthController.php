@@ -13,7 +13,7 @@ use OpenApi\Annotations as OA;
 class AuthController extends Controller
 {
     /**
-     * @OA\Info(title="Authorization api controller", version="1")
+     * @OA\Info(title="Api", version="1")
      * @OA\SecurityScheme(
      *     type="http",
      *     description="Login with email and password to get the authentication token",
