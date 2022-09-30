@@ -23,6 +23,8 @@ class JobVacancy extends Model
         'description',
     ];
 
+    public $keyType = 'string';
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -30,6 +32,6 @@ class JobVacancy extends Model
 
     public function responses(): HasMany
     {
-        return $this->hasMany(JobVacancyResponse::class, 'job_id');
+        return $this->hasMany(JobVacancyResponse::class,'job_id');
     }
 }

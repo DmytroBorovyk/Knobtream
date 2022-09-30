@@ -22,6 +22,8 @@ class JobVacancyResponse extends Model
         'review_text',
     ];
 
+    public $keyType = 'string';
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
