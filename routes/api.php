@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JobCatalogController;
+use App\Http\Controllers\JobVacancyResponseController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,12 +20,21 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::get('/catalog', [JobCatalogController::class, 'index']);
 Route::get('/catalog/show/{id}', [JobCatalogController::class, 'show']);
+Route::get('/response/show/{id}', [JobVacancyResponseController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', [AuthController::class, 'user']);
-    Route::post('/catalog/job', [JobCatalogController::class, 'create']);
-    Route::put('/catalog/job/{id}', [JobCatalogController::class, 'update']);
-    Route::delete('/catalog/job/{id}', [JobCatalogController::class, 'delete']);
-    Route::get('/catalog/user-jobs', [JobCatalogController::class, 'userJobList']);
+    Route::prefix('catalog')->group(function () {
+        Route::post('job', [JobCatalogController::class, 'create']);
+        Route::put('job/{id}', [JobCatalogController::class, 'update']);
+        Route::delete('job/{id}', [JobCatalogController::class, 'delete']);
+        Route::get('user-jobs', [JobCatalogController::class, 'userJobList']);
+    });
+    Route::prefix('response')->group(function () {
+        Route::post('/', [JobVacancyResponseController::class, 'create']);
+        Route::delete('{id}', [JobVacancyResponseController::class, 'delete']);
+        Route::get('user-responses', [JobVacancyResponseController::class, 'userResponsesList']);
+    });
+
     Route::get('/auth/logout', [AuthController::class, 'logout']);
 });
