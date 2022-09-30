@@ -26,18 +26,29 @@ class JobResponseService
         return new JobVacancyResponseResource($response);
     }
 
-    public function create(ResponseOperationRequest $request): JobVacancyResponseResource
+    public function create(ResponseOperationRequest $request): JobVacancyResponseResource|Response
     {
-        $response = new JobVacancyResponse();
-        $response->fill($request->validated());
-        $response->user_id = Auth::user()->getKey();
-        $response->save();
+        $created_responses = JobVacancyResponse::where('job_id', $request->job_id)
+            ->where('user_id', Auth::user()->getKey())
+            ->count();
 
-        $vacancy = JobVacancy::findOrFail($request->job_id);
-        $vacancy->response_count++;
-        $vacancy->save();
+        if ($created_responses === 0) {
+            $response = new JobVacancyResponse();
+            $response->fill($request->validated());
+            $response->user_id = Auth::user()->getKey();
+            $response->save();
 
-        return new JobVacancyResponseResource($response);
+            $vacancy = JobVacancy::findOrFail($request->job_id);
+            $vacancy->response_count++;
+            $vacancy->save();
+
+            return new JobVacancyResponseResource($response);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Response for this job have been already created',
+        ], 400);
     }
 
     public function update(string $id, ResponseOperationRequest $request): JobVacancyResponseResource|Response
@@ -67,6 +78,7 @@ class JobResponseService
             $vacancy = JobVacancy::findOrFail($vacancy_id);
             $vacancy->response_count--;
             $vacancy->save();
+
             return response()->json([
                 'status' => true,
                 'message' => 'deleted',

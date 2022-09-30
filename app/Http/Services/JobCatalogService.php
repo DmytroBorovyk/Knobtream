@@ -7,6 +7,7 @@ use App\Http\Resources\JobVacancyResource;
 use App\Models\JobVacancy;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse as Response;
 
@@ -32,17 +33,29 @@ class JobCatalogService
         return new JobVacancyResource($vacancy);
     }
 
-    public function create(JobOperationRequest $request): JobVacancyResource
+    public function create(JobOperationRequest $request): JobVacancyResource|Response
     {
-        $vacancy = new JobVacancy();
-        $vacancy->fill($request->validated());
-        $vacancy->user_id = Auth::user()->getKey();
-        $vacancy->save();
+        $vacancies_day_count = JobVacancy::withTrashed()
+            ->whereDate('created_at', Carbon::today())
+            ->where('user_id', Auth::user()->getKey())
+            ->count();
 
-        return new JobVacancyResource($vacancy);
+        if ($vacancies_day_count < 2) {
+            $vacancy = new JobVacancy();
+            $vacancy->fill($request->validated());
+            $vacancy->user_id = Auth::user()->getKey();
+            $vacancy->save();
+
+            return new JobVacancyResource($vacancy);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'User already created 2 vacancies for today',
+        ], 400);
     }
 
-    public function update(string $id, JobOperationRequest $request): JobVacancyResource | Response
+    public function update(string $id, JobOperationRequest $request): JobVacancyResource|Response
     {
         $vacancy = JobVacancy::findOrFail($id);
 

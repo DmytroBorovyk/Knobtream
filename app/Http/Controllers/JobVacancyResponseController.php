@@ -50,9 +50,13 @@ class JobVacancyResponseController extends Controller
     }
 
     /**
-     *  @OA\Schema( schema="ResponseOperationRequest",
+     * @OA\Schema( schema="ResponseOperationRequest",
      *      @OA\Property(property="job_id", type="integer", example=1),
      *      @OA\Property(property="review_text", type="string", example="text"),
+     *  )
+     * @OA\Schema( schema="ResponseForJobAlreadyCreated",
+     *      @OA\Property(property="status", type="boolean", example=false),
+     *      @OA\Property(property="message", type="string", example="Response for this job have been already created"),
      *  )
      * @OA\Post(
      *      path="/api/response/",
@@ -73,6 +77,14 @@ class JobVacancyResponseController extends Controller
      *          )
      *      ),
      *      @OA\Response(
+     *          response=400,
+     *          description="Bad operation",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              ref="#/components/schemas/ResponseForJobAlreadyCreated"
+     *          )
+     *      ),
+     *      @OA\Response(
      *          response=401,
      *          description="Unauthorized operation",
      *          @OA\JsonContent(
@@ -90,13 +102,15 @@ class JobVacancyResponseController extends Controller
      *      )
      *  )
      */
-    public function create(ResponseOperationRequest $request, JobResponseService $service): JobVacancyResponseResource
-    {
+    public function create(
+        ResponseOperationRequest $request,
+        JobResponseService $service
+    ): JobVacancyResponseResource|Response {
         return $service->create($request);
     }
 
     /**
-     *  @OA\Delete(
+     * @OA\Delete(
      *      path="/api/response/{id}",
      *      operationId="DeleteJobResponse",
      *      summary="Delete response",

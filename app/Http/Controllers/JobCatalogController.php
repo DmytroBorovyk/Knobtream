@@ -79,6 +79,10 @@ class JobCatalogController extends Controller
      *      @OA\Property(property="title", type="string", example="title"),
      *      @OA\Property(property="description", type="string", example="description"),
      *  )
+     * @OA\Schema( schema="MaxJobsCreatedResponse",
+     *      @OA\Property(property="status", type="boolean", example=false),
+     *      @OA\Property(property="message", type="string", example="User already created 2 vacancies for today"),
+     *  )
      * @OA\Post(
      *      path="/api/catalog/job",
      *      operationId="CreateJob",
@@ -95,6 +99,14 @@ class JobCatalogController extends Controller
      *          @OA\JsonContent(
      *              type="object",
      *              ref="#/components/schemas/JobVacancyResource"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad operation",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              ref="#/components/schemas/MaxJobsCreatedResponse"
      *          )
      *      ),
      *      @OA\Response(
@@ -115,13 +127,13 @@ class JobCatalogController extends Controller
      *      )
      *  )
      */
-    public function create(JobOperationRequest $request, JobCatalogService $service): JobVacancyResource
+    public function create(JobOperationRequest $request, JobCatalogService $service): JobVacancyResource|Response
     {
         return $service->create($request);
     }
 
     /**
-     *  @OA\Schema( schema="ItemDoesNotBelongsToUserResponse",
+     * @OA\Schema( schema="ItemDoesNotBelongsToUserResponse",
      *      @OA\Property(property="status", type="boolean", example=false),
      *      @OA\Property(property="token", type="string", example="This item does not belong to user"),
      *  )
@@ -182,11 +194,11 @@ class JobCatalogController extends Controller
     }
 
     /**
-     *  @OA\Schema( schema="ItemDeletedResponse",
+     * @OA\Schema( schema="ItemDeletedResponse",
      *      @OA\Property(property="status", type="boolean", example=true),
      *      @OA\Property(property="token", type="string", example="deleted"),
      *  )
-     *  @OA\Delete(
+     * @OA\Delete(
      *      path="/api/catalog/job/{id}",
      *      operationId="DeleteJob",
      *      summary="Delete job vacancy",
