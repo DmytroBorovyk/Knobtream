@@ -26,6 +26,7 @@ class JobOperationRequest extends FormRequest
         return [
             'title' => 'required',
             'description' => 'required',
+            'tags' => 'array'
         ];
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Annotations as OA;
 
 /**
- *  @OA\Schema(
+ * @OA\Schema(
  *      @OA\Property(property="id", type="string", example="1"),
  *      @OA\Property(property="title", type="string", example="Joe Dow"),
  *      @OA\Property(property="description", type="string", example="qwerty@gmail.com"),
@@ -18,11 +18,16 @@ use OpenApi\Annotations as OA;
  *          )
  *     ),
  *     @OA\Property(property="likes", type="integer", example=5),
+ *     @OA\Property(property="tags", description="tags or nothing", type="array",
+ *          @OA\Items(
+ *              ref="#/components/schemas/TagResource",
+ *          )
+ *     ),
  *  )
  *
  * @property JobVacancy $resource
  */
-class JobVacancyResource extends  JsonResource
+class JobVacancyResource extends JsonResource
 {
     public function toArray($request): array
     {
@@ -33,9 +38,11 @@ class JobVacancyResource extends  JsonResource
             'response_count' => $this->resource->response_count,
             'owner' => new UserResource($this->whenLoaded('owner')),
             'responses' => JobVacancyResponseResource::collection($this->whenLoaded('responses')),
-            'likes' => $this->whenLoaded('likes', function() {
+            'likes' => $this->whenLoaded('likes', function () {
                 return $this->likes->count();
             }),
+            'created_at' => $this->created_at,
+            'tags' => TagResource::collection($this->whenLoaded('tags')),
         ];
     }
 }

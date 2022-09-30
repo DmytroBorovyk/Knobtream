@@ -42,3 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/auth/logout', [AuthController::class, 'logout']);
 });
+
+Route::get('/qw', function(){
+    $job = \App\Models\JobVacancy::find(2);
+    dd($job->tags);
+});

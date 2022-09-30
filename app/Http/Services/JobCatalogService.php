@@ -15,15 +15,48 @@ class JobCatalogService
 {
     public function index(Request $request): AnonymousResourceCollection
     {
+        $vacancies = JobVacancy::with(['owner', 'likes', 'tags'])->get();
+
+        if ($request->dateFrom) {
+            $vacancies = $vacancies->where('created_at', '>=', $request->dateFrom);
+        }
+
+        if ($request->dateTo) {
+            $vacancies = $vacancies->where('created_at', '<=', $request->dateTo);
+        }
+
         if ($request->orderBy) {
-            $vacancies = JobVacancy::with(['owner', 'likes'])
-                ->orderBy($request->orderBy, $request->orderWay ?: 'ASC')
-                ->paginate(20);
-        } else {
-            $vacancies = JobVacancy::with(['owner', 'likes'])->paginate(20);
+            $vacancies = $this->order($vacancies, $request);
+        }
+
+        if ($request->tags) {
+            $vacancies = $this->filter($vacancies, $request->tags);
         }
 
         return JobVacancyResource::collection($vacancies);
+    }
+
+    public function filter($vacancies, string $tags)
+    {
+        $tags = explode(',', $tags);
+        $vacancies = $vacancies->map(function($item) use ($tags){
+            foreach ($item->tags->pluck('id') as $tag){
+                if(in_array($tag, $tags)){
+                    return $item;
+                }
+            }
+        });
+
+        return $vacancies->filter();
+    }
+
+    public function order($vacancies, $request)
+    {
+        if ($request->orderWay === 'asc') {
+            return $vacancies->sortBy($request->orderBy);
+        }
+
+        return $vacancies->sortByDesc($request->orderBy);
     }
 
     public function show(string $id): JobVacancyResource
@@ -46,6 +79,10 @@ class JobCatalogService
                 $vacancy->fill($request->validated());
                 $vacancy->user_id = Auth::user()->getKey();
                 $vacancy->save();
+
+                if ($request->tags) {
+                    $vacancy->tags()->sync($request->tags);
+                }
 
                 Auth::user()->balance -= 2;
                 Auth::user()->save();
@@ -72,6 +109,10 @@ class JobCatalogService
         if ($vacancy->user_id == Auth::user()->getKey()) {
             $vacancy->fill($request->validated());
             $vacancy->save();
+
+            if ($request->tags) {
+                $vacancy->tags()->sync($request->tags);
+            }
 
             return new JobVacancyResource($vacancy);
         }

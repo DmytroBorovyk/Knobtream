@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -38,5 +39,10 @@ class JobVacancy extends Model
     public function likes(): HasMany
     {
         return $this->hasMany(Like::class,'liked_id')->where('type', 'job');
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'vacancy_tag', 'vacancy_id', 'tag_id');
     }
 }

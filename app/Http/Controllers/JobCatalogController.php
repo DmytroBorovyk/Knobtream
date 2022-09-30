@@ -78,6 +78,9 @@ class JobCatalogController extends Controller
      * @OA\Schema( schema="JobOperationRequest",
      *      @OA\Property(property="title", type="string", example="title"),
      *      @OA\Property(property="description", type="string", example="description"),
+     *      @OA\Property(property="tags", type="array",
+     *          @OA\Items(example="1")
+     *      ),
      *  )
      * @OA\Schema( schema="MaxJobsCreatedResponse",
      *      @OA\Property(property="status", type="boolean", example=false),
