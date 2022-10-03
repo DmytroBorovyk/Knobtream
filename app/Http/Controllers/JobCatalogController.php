@@ -12,6 +12,10 @@ use OpenApi\Annotations as OA;
 
 class JobCatalogController extends Controller
 {
+    public function __construct(private JobCatalogService $service)
+    {
+    }
+
     /**
      * @OA\Get(
      *      path="/api/catalog",
@@ -36,9 +40,9 @@ class JobCatalogController extends Controller
      *      )
      *  )
      */
-    public function index(Request $request, JobCatalogService $service): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return $service->index($request);
+        return $this->service->index($request);
     }
 
     /**
@@ -69,9 +73,9 @@ class JobCatalogController extends Controller
      *      )
      *  )
      */
-    public function show(string $id, Request $request, JobCatalogService $service): JobVacancyResource
+    public function show(string $id, Request $request): JobVacancyResource
     {
-        return $service->show($id);
+        return $this->service->show($id);
     }
 
     /**
@@ -130,9 +134,9 @@ class JobCatalogController extends Controller
      *      )
      *  )
      */
-    public function create(JobOperationRequest $request, JobCatalogService $service): JobVacancyResource|Response
+    public function create(JobOperationRequest $request): JobVacancyResource|Response
     {
-        return $service->create($request);
+        return $this->service->create($request);
     }
 
     /**
@@ -191,9 +195,9 @@ class JobCatalogController extends Controller
      *      )
      *  )
      */
-    public function update(string $id, JobOperationRequest $request, JobCatalogService $service): JobVacancyResource
+    public function update(string $id, JobOperationRequest $request): JobVacancyResource
     {
-        return $service->update($id, $request);
+        return $this->service->update($id, $request);
     }
 
     /**
@@ -248,9 +252,9 @@ class JobCatalogController extends Controller
      *      )
      *  )
      */
-    public function delete(string $id, JobCatalogService $service): Response
+    public function delete(string $id): Response
     {
-        return $service->delete($id);
+        return $this->service->delete($id);
     }
 
     /**
@@ -286,8 +290,8 @@ class JobCatalogController extends Controller
      *      )
      *  )
      */
-    public function userJobList(JobCatalogService $service): AnonymousResourceCollection
+    public function userJobList(): AnonymousResourceCollection
     {
-        return $service->userJobList();
+        return $this->service->userJobList();
     }
 }

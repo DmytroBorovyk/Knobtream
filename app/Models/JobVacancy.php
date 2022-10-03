@@ -22,6 +22,7 @@ class JobVacancy extends Model
         'user_id',
         'title',
         'description',
+        'response_count'
     ];
 
     public $keyType = 'string';
@@ -49,5 +50,17 @@ class JobVacancy extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'vacancy_tag', 'vacancy_id', 'tag_id');
+    }
+
+    public function addReviewsCount()
+    {
+        $this->response_count++;
+        $this->save();
+    }
+
+    public function removeReviewsCount()
+    {
+        $this->response_count--;
+        $this->save();
     }
 }

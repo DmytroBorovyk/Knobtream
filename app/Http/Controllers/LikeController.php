@@ -10,6 +10,10 @@ use OpenApi\Annotations as OA;
 
 class LikeController extends Controller
 {
+    public function __construct(private LikeService $service)
+    {
+    }
+
     /**
      * @OA\Schema( schema="LikeRequest",
      *      @OA\Property(property="liked_id", type="string", example="1"),
@@ -55,9 +59,9 @@ class LikeController extends Controller
      *      )
      *  )
      */
-    public function like(LikeRequest $request, LikeService $service): Response
+    public function like(LikeRequest $request): Response
     {
-        return $service->like($request);
+        return $this->service->like($request);
     }
 
     /**
@@ -85,9 +89,9 @@ class LikeController extends Controller
      *      )
      *  )
      */
-    public function getLikedJobs(LikeService $service): AnonymousResourceCollection
+    public function getLikedJobs(): AnonymousResourceCollection
     {
-        return $service->getLikedJobs();
+        return $this->service->getLikedJobs();
     }
 
     /**
@@ -115,8 +119,8 @@ class LikeController extends Controller
      *      )
      *  )
      */
-    public function getLikedUsers(LikeService $service): AnonymousResourceCollection
+    public function getLikedUsers(): AnonymousResourceCollection
     {
-        return $service->getLikedUsers();
+        return $this->service->getLikedUsers();
     }
 }

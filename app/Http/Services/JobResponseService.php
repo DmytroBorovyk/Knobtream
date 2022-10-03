@@ -14,6 +14,10 @@ use Illuminate\Http\JsonResponse as Response;
 
 class JobResponseService
 {
+    public function __construct(private MailService $mail_service)
+    {
+    }
+
     public function index(Request $request): Exception
     {
         return new Exception(501, 'Not implemented yet');
@@ -26,7 +30,7 @@ class JobResponseService
         return new JobVacancyResponseResource($response);
     }
 
-    public function create(ResponseOperationRequest $request, MailService $service): JobVacancyResponseResource|Response
+    public function create(ResponseOperationRequest $request): JobVacancyResponseResource|Response
     {
         if (Auth::user()->balance - 1 >= 0) {
             $created_responses = JobVacancyResponse::where('job_id', $request->job_id)
@@ -37,18 +41,15 @@ class JobResponseService
             if ($created_responses === 0) {
                 $vacancy = JobVacancy::findOrFail($request->job_id);
                 if ($vacancy->user_id !== Auth::user()->getKey()) {
-                    $response = new JobVacancyResponse();
-                    $response->fill($request->validated());
-                    $response->user_id = Auth::user()->getKey();
-                    $response->save();
+                    $data = $request->validated();
+                    $data['user_id'] = Auth::user()->getKey();
+                    $response = JobVacancyResponse::create($data);
 
-                    $vacancy->response_count++;
-                    $vacancy->save();
+                    $vacancy->addReviewsCount();
 
-                    Auth::user()->balance -= 1;
-                    Auth::user()->save();
+                    Auth::user()->removeCoins(1);
 
-                    $service->check($vacancy);
+                    $this->mail_service->check($vacancy);
 
                     return new JobVacancyResponseResource($response);
                 }
@@ -76,8 +77,7 @@ class JobResponseService
         $response = JobVacancyResponse::findOrFail($id);
 
         if ($response->user_id == Auth::user()->getKey()) {
-            $response->fill($request->validated());
-            $response->save();
+            $response->update($request->validated());
 
             return new JobVacancyResponseResource($response);
         }
@@ -96,8 +96,7 @@ class JobResponseService
             $response->delete();
 
             $vacancy = JobVacancy::findOrFail($vacancy_id);
-            $vacancy->response_count--;
-            $vacancy->save();
+            $vacancy->removeReviewsCount();
 
             return response()->json([
                 'status' => true,

@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\JobOperationRequest;
 use App\Http\Requests\ResponseOperationRequest;
-use App\Http\Resources\JobVacancyResource;
 use App\Http\Resources\JobVacancyResponseResource;
-use App\Http\Services\JobCatalogService;
 use App\Http\Services\JobResponseService;
-use App\Http\Services\MailService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse as Response;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -16,6 +12,10 @@ use OpenApi\Annotations as OA;
 
 class JobVacancyResponseController extends Controller
 {
+
+    public function __construct(private JobResponseService $service)
+    {
+    }
 
     /**
      * @OA\Get(
@@ -45,9 +45,9 @@ class JobVacancyResponseController extends Controller
      *      )
      *  )
      */
-    public function show(string $id, Request $request, JobResponseService $service): JobVacancyResponseResource
+    public function show(string $id, Request $request): JobVacancyResponseResource
     {
-        return $service->show($id);
+        return $this->service->show($id);
     }
 
     /**
@@ -103,12 +103,8 @@ class JobVacancyResponseController extends Controller
      *      )
      *  )
      */
-    public function create(
-        ResponseOperationRequest $request,
-        JobResponseService $service,
-        MailService $mail_service
-    ): JobVacancyResponseResource|Response {
-        return $service->create($request, $mail_service);
+    public function create(ResponseOperationRequest $request): JobVacancyResponseResource|Response {
+        return $this->service->create($request);
     }
 
     /**
@@ -159,9 +155,9 @@ class JobVacancyResponseController extends Controller
      *      )
      *  )
      */
-    public function delete(string $id, JobResponseService $service): Response
+    public function delete(string $id): Response
     {
-        return $service->delete($id);
+        return $this->service->delete($id);
     }
 
     /**
@@ -197,8 +193,8 @@ class JobVacancyResponseController extends Controller
      *      )
      *  )
      */
-    public function userResponsesList(JobResponseService $service): AnonymousResourceCollection
+    public function userResponsesList(): AnonymousResourceCollection
     {
-        return $service->userResponseList();
+        return $this->service->userResponseList();
     }
 }

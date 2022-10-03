@@ -75,17 +75,15 @@ class JobCatalogService
                 ->count();
 
             if ($vacancies_day_count < 2) {
-                $vacancy = new JobVacancy();
-                $vacancy->fill($request->validated());
-                $vacancy->user_id = Auth::user()->getKey();
-                $vacancy->save();
+                $data = $request->validated();
+                $data['user_id'] = Auth::user()->getKey();
+                $vacancy = JobVacancy::create($data);
 
                 if ($request->tags) {
                     $vacancy->tags()->sync($request->tags);
                 }
 
-                Auth::user()->balance -= 2;
-                Auth::user()->save();
+                Auth::user()->removeCoins(2);
 
                 return new JobVacancyResource($vacancy);
             }
@@ -107,8 +105,7 @@ class JobCatalogService
         $vacancy = JobVacancy::findOrFail($id);
 
         if ($vacancy->user_id == Auth::user()->getKey()) {
-            $vacancy->fill($request->validated());
-            $vacancy->save();
+            $vacancy->update($request->validated());
 
             if ($request->tags) {
                 $vacancy->tags()->sync($request->tags);

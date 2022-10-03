@@ -32,11 +32,11 @@ class LikeService
                 ], 200);
             }
 
-            $like = new Like();
-            $like->user_id = Auth::user()->getKey();
-            $like->liked_id = $request->liked_id;
-            $like->type = $request->type;
-            $like->save();
+            Like::create([
+                'user_id' => Auth::user()->getKey(),
+                'liked_id' => $request->liked_id,
+                'type' => $request->type,
+            ]);
 
             return response()->json([
                 'status' => true,

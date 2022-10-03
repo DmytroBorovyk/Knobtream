@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JobCatalogController;
 use App\Http\Controllers\JobVacancyResponseController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::get('/catalog', [JobCatalogController::class, 'index']);
+Route::get('/tags', [TagController::class, 'index']);
 Route::get('/catalog/show/{id}', [JobCatalogController::class, 'show']);
 Route::get('/response/show/{id}', [JobVacancyResponseController::class, 'show']);
 
@@ -41,9 +43,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/liked-users', [LikeController::class, 'getLikedUsers']);
 
     Route::get('/auth/logout', [AuthController::class, 'logout']);
-});
-
-Route::get('/qw', function(){
-    $job = \App\Models\JobVacancy::find(2);
-    dd($job->tags);
 });
