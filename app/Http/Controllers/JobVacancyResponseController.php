@@ -8,6 +8,7 @@ use App\Http\Resources\JobVacancyResource;
 use App\Http\Resources\JobVacancyResponseResource;
 use App\Http\Services\JobCatalogService;
 use App\Http\Services\JobResponseService;
+use App\Http\Services\MailService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse as Response;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -104,9 +105,10 @@ class JobVacancyResponseController extends Controller
      */
     public function create(
         ResponseOperationRequest $request,
-        JobResponseService $service
+        JobResponseService $service,
+        MailService $mail_service
     ): JobVacancyResponseResource|Response {
-        return $service->create($request);
+        return $service->create($request, $mail_service);
     }
 
     /**
