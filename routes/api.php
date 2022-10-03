@@ -1,6 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\JobCatalogController;
+use App\Http\Controllers\JobVacancyResponseController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +18,29 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/register', [AuthController::class, 'register']);
+Route::get('/catalog', [JobCatalogController::class, 'index']);
+Route::get('/tags', [TagController::class, 'index']);
+Route::get('/catalog/show/{id}', [JobCatalogController::class, 'show']);
+Route::get('/response/show/{id}', [JobVacancyResponseController::class, 'show']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('user', [AuthController::class, 'user']);
+    Route::prefix('catalog')->group(function () {
+        Route::post('job', [JobCatalogController::class, 'create']);
+        Route::put('job/{id}', [JobCatalogController::class, 'update']);
+        Route::delete('job/{id}', [JobCatalogController::class, 'delete']);
+        Route::get('user-jobs', [JobCatalogController::class, 'userJobList']);
+    });
+    Route::prefix('response')->group(function () {
+        Route::post('/', [JobVacancyResponseController::class, 'create']);
+        Route::delete('{id}', [JobVacancyResponseController::class, 'delete']);
+        Route::get('user-responses', [JobVacancyResponseController::class, 'userResponsesList']);
+    });
+    Route::post('/like-toggle', [LikeController::class, 'like']);
+    Route::get('/liked-jobs', [LikeController::class, 'getLikedJobs']);
+    Route::get('/liked-users', [LikeController::class, 'getLikedUsers']);
+
+    Route::get('/auth/logout', [AuthController::class, 'logout']);
 });

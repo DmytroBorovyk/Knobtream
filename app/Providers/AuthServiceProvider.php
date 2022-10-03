@@ -3,7 +3,11 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
+use App\Http\Services\AuthService;
+use App\Models\JobVacancy;
+use App\Policies\JobVacancyPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Queue\Jobs\Job;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -13,7 +17,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        JobVacancy::class => JobVacancyPolicy::class
     ];
 
     /**
@@ -24,7 +28,13 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-
         //
+    }
+
+    public function register()
+    {
+        $this->app->bind(AuthService::class, function () {
+            return new AuthService();
+        });
     }
 }
