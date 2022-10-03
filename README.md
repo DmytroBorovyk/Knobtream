@@ -25,4 +25,4 @@ run inside php container `vendor/bin/php-cs-fixer fix --config=php_cs.dist.php`
 ## to generate API documentation
 run inside php container `php artisan l5-swagger:generate`
 
-to check documentation go forward by uri `/api/documentation`
+to check documentation go forward by uri `http://localhost:2715/api/documentation`
