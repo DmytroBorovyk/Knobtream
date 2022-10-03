@@ -26,7 +26,7 @@ class JobResponseService
         return new JobVacancyResponseResource($response);
     }
 
-    public function create(ResponseOperationRequest $request): JobVacancyResponseResource|Response
+    public function create(ResponseOperationRequest $request, MailService $service): JobVacancyResponseResource|Response
     {
         if (Auth::user()->balance - 1 >= 0) {
             $created_responses = JobVacancyResponse::where('job_id', $request->job_id)
@@ -42,12 +42,13 @@ class JobResponseService
                     $response->user_id = Auth::user()->getKey();
                     $response->save();
 
-
                     $vacancy->response_count++;
                     $vacancy->save();
 
                     Auth::user()->balance -= 1;
                     Auth::user()->save();
+
+                    $service->check($vacancy);
 
                     return new JobVacancyResponseResource($response);
                 }
