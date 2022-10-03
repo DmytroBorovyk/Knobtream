@@ -15,7 +15,7 @@ class Like extends Model
 
     protected $fillable = [
         'user_id',
-        'job_id',
+        'liked_id',
     ];
 
     protected $casts = [

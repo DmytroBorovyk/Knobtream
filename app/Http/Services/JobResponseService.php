@@ -14,10 +14,6 @@ use Illuminate\Http\JsonResponse as Response;
 
 class JobResponseService
 {
-    public function __construct(private MailService $mail_service)
-    {
-    }
-
     public function index(Request $request): Exception
     {
         return new Exception(501, 'Not implemented yet');
@@ -30,7 +26,7 @@ class JobResponseService
         return new JobVacancyResponseResource($response);
     }
 
-    public function create(ResponseOperationRequest $request): JobVacancyResponseResource|Response
+    public function create(ResponseOperationRequest $request, MailService $mail_service): JobVacancyResponseResource|Response
     {
         if (Auth::user()->balance - 1 >= 0) {
             $created_responses = JobVacancyResponse::where('job_id', $request->job_id)
@@ -49,7 +45,7 @@ class JobResponseService
 
                     Auth::user()->removeCoins(1);
 
-                    $this->mail_service->check($vacancy);
+                    $mail_service->check($vacancy);
 
                     return new JobVacancyResponseResource($response);
                 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ResponseOperationRequest;
 use App\Http\Resources\JobVacancyResponseResource;
 use App\Http\Services\JobResponseService;
+use App\Http\Services\MailService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse as Response;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -13,7 +14,7 @@ use OpenApi\Annotations as OA;
 class JobVacancyResponseController extends Controller
 {
 
-    public function __construct(private JobResponseService $service)
+    public function __construct(private JobResponseService $service, private MailService $mail_service)
     {
     }
 
@@ -104,7 +105,7 @@ class JobVacancyResponseController extends Controller
      *  )
      */
     public function create(ResponseOperationRequest $request): JobVacancyResponseResource|Response {
-        return $this->service->create($request);
+        return $this->service->create($request, $this->mail_service);
     }
 
     /**

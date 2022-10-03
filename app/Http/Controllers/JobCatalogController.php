@@ -17,11 +17,24 @@ class JobCatalogController extends Controller
     }
 
     /**
+     * @OA\Schema(schema="CatalogRequest",
+     *      description="each field is not required",
+     *      @OA\Property(property="tags", type="string", example="1,2"),
+     *      @OA\Property(property="dateFrom", type="string", example="2022-1-1"),
+     *      @OA\Property(property="dateTo", type="string", example="2022-1-1"),
+     *      @OA\Property(property="orderBy", type="string", example="created_at"),
+     *      @OA\Property(property="orderWay", type="string", example="asc"),
+     * )
+     *
      * @OA\Get(
      *      path="/api/catalog",
      *      operationId="Catalog",
      *      summary="Catalog",
      *      tags={"JobVacancyCatalog"},
+     *      @OA\RequestBody(
+     *          required=false,
+     *          @OA\JsonContent(ref="#/components/schemas/CatalogRequest")
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
