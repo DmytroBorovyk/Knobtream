@@ -5,6 +5,7 @@ namespace App\Http\Services;
 use App\Http\Requests\JobOperationRequest;
 use App\Http\Resources\JobVacancyResource;
 use App\Models\JobVacancy;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Carbon;
@@ -13,6 +14,8 @@ use Illuminate\Http\JsonResponse as Response;
 
 class JobCatalogService
 {
+    use AuthorizesRequests;
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $vacancies = JobVacancy::with(['owner', 'likes', 'tags'])->get();
@@ -39,9 +42,9 @@ class JobCatalogService
     public function filter($vacancies, string $tags)
     {
         $tags = explode(',', $tags);
-        $vacancies = $vacancies->map(function($item) use ($tags){
-            foreach ($item->tags->pluck('id') as $tag){
-                if(in_array($tag, $tags)){
+        $vacancies = $vacancies->map(function ($item) use ($tags) {
+            foreach ($item->tags->pluck('id') as $tag) {
+                if (in_array($tag, $tags)) {
                     return $item;
                 }
             }
@@ -103,39 +106,27 @@ class JobCatalogService
     public function update(string $id, JobOperationRequest $request): JobVacancyResource|Response
     {
         $vacancy = JobVacancy::findOrFail($id);
+        $this->authorize('update', $vacancy);
 
-        if ($vacancy->user_id == Auth::user()->getKey()) {
-            $vacancy->update($request->validated());
+        $vacancy->update($request->validated());
 
-            if ($request->tags) {
-                $vacancy->tags()->sync($request->tags);
-            }
-
-            return new JobVacancyResource($vacancy);
+        if ($request->tags) {
+            $vacancy->tags()->sync($request->tags);
         }
 
-        return response()->json([
-            'status' => false,
-            'message' => 'This job does not belong to user',
-        ], 422);
+        return new JobVacancyResource($vacancy);
     }
 
     public function delete(string $id): Response
     {
         $vacancy = JobVacancy::findOrFail($id);
-        if ($vacancy->user_id == Auth::user()->getKey()) {
-            $vacancy->delete();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'deleted',
-            ], 200);
-        }
+        $this->authorize('delete', $vacancy);
+        $vacancy->delete();
 
         return response()->json([
-            'status' => false,
-            'message' => 'This job does not belong to user',
-        ], 422);
+            'status' => true,
+            'message' => 'deleted',
+        ], 200);
     }
 
     public function userJobList(): AnonymousResourceCollection
