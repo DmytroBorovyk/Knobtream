@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Setting;
-use App\Models\User;
+use App\Jobs\AddUserCoins;
 use Illuminate\Console\Command;
 
 class DailyCoinAddCommand extends Command
@@ -12,15 +11,6 @@ class DailyCoinAddCommand extends Command
 
     public function handle()
     {
-        $users = User::get();
-        $coins_to_add = Setting::where('setting', 'coins')->first()->value;
-
-        foreach ($users as $user) {
-            $user->balance += $coins_to_add;
-            if ($user->balance > 5) {
-                $user->balance = 5;
-            }
-            $user->save();
-        }
+        AddUserCoins::dispatch();
     }
 }
