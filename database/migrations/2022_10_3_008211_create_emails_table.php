@@ -15,8 +15,12 @@ return new class extends Migration
     {
         Schema::create('emails', function (Blueprint $table) {
             $table->id();
-            $table->integer('vacancy_id');
+            $table->integer('vacancy_id')->unsigned();
             $table->timestamps();
+        });
+
+        Schema::table('emails', function($table) {
+            $table->foreign('vacancy_id')->references('id')->on('job_vacancies');
         });
     }
 

@@ -15,11 +15,16 @@ return new class extends Migration
     {
         Schema::create('job_reviews', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id');
-            $table->string('job_id');
+            $table->integer('user_id')->unsigned();
+            $table->integer('job_id')->unsigned();
             $table->text('review_text');
             $table->softDeletes();
             $table->timestamps();
+        });
+
+        Schema::table('job_reviews', function($table) {
+            $table->foreign( 'user_id')->references('id')->on('users');
+            $table->foreign('job_id')->references('id')->on('job_vacancies');
         });
     }
 

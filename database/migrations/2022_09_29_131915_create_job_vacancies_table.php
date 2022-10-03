@@ -15,12 +15,16 @@ return new class extends Migration
     {
         Schema::create('job_vacancies', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id');
+            $table->integer('user_id')->unsigned();
             $table->string('title');
             $table->text('description');
             $table->integer('response_count')->default(0);
             $table->softDeletes();
             $table->timestamps();
+        });
+
+        Schema::table('job_vacancies', function($table) {
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

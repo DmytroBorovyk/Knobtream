@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'balance',
     ];
 
     public $keyType = 'string';
@@ -58,5 +59,17 @@ class User extends Authenticatable
     public function likes(): HasMany
     {
         return $this->hasMany(Like::class, 'user_id');
+    }
+
+    public function addCoins(int $amount)
+    {
+        $this->balance += $amount;
+        $this->save();
+    }
+
+    public function removeCoins(int $amount)
+    {
+        $this->balance -= $amount;
+        $this->save();
     }
 }

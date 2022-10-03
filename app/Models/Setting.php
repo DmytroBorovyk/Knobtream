@@ -13,5 +13,10 @@ class Setting extends Model
         'id',
     ];
 
+    protected $fillable = [
+        'setting',
+        'value'
+    ];
+
     public $keyType = 'string';
 }

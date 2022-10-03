@@ -13,5 +13,9 @@ class Tag extends Model
         'id',
     ];
 
+    protected $fillable = [
+        'title'
+    ];
+
     public $keyType = 'string';
 }
