@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegistrationRequest;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -29,6 +30,7 @@ class AuthService
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'balance' => Setting::where('setting', 'default_coins')->first()->value,
         ]);
 
         return $user->createToken("API TOKEN")->plainTextToken;
