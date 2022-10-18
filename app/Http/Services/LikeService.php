@@ -57,7 +57,7 @@ class LikeService
             return $item->liked_job;
         }, []);
 
-        return JobVacancyResource::collection(collect($liked_jobs));
+        return JobVacancyResource::collection($liked_jobs);
     }
 
     public function getLikedUsers(): AnonymousResourceCollection
@@ -68,6 +68,6 @@ class LikeService
             return $item->liked_user;
         }, []);
 
-        return UserResource::collection(collect($liked_users));
+        return UserResource::collection($liked_users);
     }
 }

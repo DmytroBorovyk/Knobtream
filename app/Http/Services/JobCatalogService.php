@@ -5,9 +5,12 @@ namespace App\Http\Services;
 use App\Http\Requests\JobOperationRequest;
 use App\Http\Resources\JobVacancyResource;
 use App\Models\JobVacancy;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse as Response;
@@ -36,10 +39,19 @@ class JobCatalogService
             $vacancies = $this->filter($vacancies, $request->tags);
         }
 
+        $vacancies = $this->paginate($vacancies, $request->page, $request->perPage);
+
         return JobVacancyResource::collection($vacancies);
     }
 
-    public function filter($vacancies, string $tags)
+    public function paginate($items, $page = 1, $perPage = 15,  $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
+
+    public function filter(Collection $vacancies, string $tags): Collection
     {
         $tags = explode(',', $tags);
         $vacancies = $vacancies->map(function ($item) use ($tags) {
@@ -53,7 +65,7 @@ class JobCatalogService
         return $vacancies->filter();
     }
 
-    public function order($vacancies, $request)
+    public function order(Collection $vacancies, Request $request): Collection
     {
         if ($request->orderWay === 'asc') {
             return $vacancies->sortBy($request->orderBy);
@@ -62,22 +74,22 @@ class JobCatalogService
         return $vacancies->sortByDesc($request->orderBy);
     }
 
-    public function show(string $id): JobVacancyResource
+    public function show(JobVacancy $vacancy): JobVacancyResource
     {
-        $vacancy = JobVacancy::with(['owner', 'responses', 'likes'])->findOrFail($id);
+        $vacancy->load(['owner', 'responses', 'likes']);
 
         return new JobVacancyResource($vacancy);
     }
 
     public function create(JobOperationRequest $request): JobVacancyResource|Response
     {
-        if (Auth::user()->balance - 2 >= 0) {
+        if (Auth::user()->balance - env('JOB_CREATION_COST') >= 0) {
             $vacancies_day_count = JobVacancy::withTrashed()
                 ->whereDate('created_at', Carbon::today())
                 ->where('user_id', Auth::user()->getKey())
                 ->count();
 
-            if ($vacancies_day_count < 2) {
+            if ($vacancies_day_count < env('JOB_CREATION_PER_DAY')) {
                 $data = $request->validated();
                 $data['user_id'] = Auth::user()->getKey();
                 $vacancy = JobVacancy::create($data);
@@ -86,7 +98,7 @@ class JobCatalogService
                     $vacancy->tags()->sync($request->tags);
                 }
 
-                Auth::user()->removeCoins(2);
+                Auth::user()->removeCoins(env('JOB_CREATION_COST'));
 
                 return new JobVacancyResource($vacancy);
             }
@@ -103,9 +115,8 @@ class JobCatalogService
         ], 400);
     }
 
-    public function update(string $id, JobOperationRequest $request): JobVacancyResource|Response
+    public function update(JobVacancy $vacancy, JobOperationRequest $request): JobVacancyResource|Response
     {
-        $vacancy = JobVacancy::findOrFail($id);
         $this->authorize('update', $vacancy);
 
         $vacancy->update($request->validated());
@@ -117,9 +128,8 @@ class JobCatalogService
         return new JobVacancyResource($vacancy);
     }
 
-    public function delete(string $id): Response
+    public function delete(JobVacancy $vacancy): Response
     {
-        $vacancy = JobVacancy::findOrFail($id);
         $this->authorize('delete', $vacancy);
         $vacancy->delete();
 
