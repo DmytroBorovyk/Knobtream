@@ -19,16 +19,16 @@ class JobResponseService
         return new Exception(501, 'Not implemented yet');
     }
 
-    public function show(string $id): JobVacancyResponseResource
+    public function show(JobVacancyResponse $response): JobVacancyResponseResource
     {
-        $response = JobVacancyResponse::with(['vacancy', 'owner'])->findOrFail($id);
+        $response->load(['vacancy', 'owner']);
 
         return new JobVacancyResponseResource($response);
     }
 
     public function create(ResponseOperationRequest $request, MailService $mail_service): JobVacancyResponseResource|Response
     {
-        if (Auth::user()->balance - 1 >= 0) {
+        if (Auth::user()->balance - env('RESPONSE_CREATION_COST') >= 0) {
             $created_responses = JobVacancyResponse::where('job_id', $request->job_id)
                 ->where('user_id', Auth::user()->getKey())
                 ->count();
@@ -43,7 +43,7 @@ class JobResponseService
 
                     $vacancy->addReviewsCount();
 
-                    Auth::user()->removeCoins(1);
+                    Auth::user()->removeCoins(env('RESPONSE_CREATION_COST'));
 
                     $mail_service->check($vacancy);
 
@@ -84,9 +84,8 @@ class JobResponseService
         ], 422);
     }
 
-    public function delete(string $id): Response
+    public function delete(JobVacancyResponse $response): Response
     {
-        $response = JobVacancyResponse::findOrFail($id);
         if ($response->user_id == Auth::user()->getKey()) {
             $vacancy_id = $response->job_id;
             $response->delete();

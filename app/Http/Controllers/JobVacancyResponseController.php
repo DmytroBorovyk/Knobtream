@@ -6,6 +6,7 @@ use App\Http\Requests\ResponseOperationRequest;
 use App\Http\Resources\JobVacancyResponseResource;
 use App\Http\Services\JobResponseService;
 use App\Http\Services\MailService;
+use App\Models\JobVacancyResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse as Response;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -46,9 +47,9 @@ class JobVacancyResponseController extends Controller
      *      )
      *  )
      */
-    public function show(string $id, Request $request): JobVacancyResponseResource
+    public function show(JobVacancyResponse $response, Request $request): JobVacancyResponseResource
     {
-        return $this->service->show($id);
+        return $this->service->show($response);
     }
 
     /**
@@ -156,9 +157,9 @@ class JobVacancyResponseController extends Controller
      *      )
      *  )
      */
-    public function delete(string $id): Response
+    public function delete(JobVacancyResponse $response): Response
     {
-        return $this->service->delete($id);
+        return $this->service->delete($response);
     }
 
     /**

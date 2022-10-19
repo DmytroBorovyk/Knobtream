@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\JobOperationRequest;
 use App\Http\Resources\JobVacancyResource;
 use App\Http\Services\JobCatalogService;
+use App\Models\JobVacancy;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse as Response;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -86,9 +87,9 @@ class JobCatalogController extends Controller
      *      )
      *  )
      */
-    public function show(string $id, Request $request): JobVacancyResource
+    public function show(JobVacancy $vacancy, Request $request): JobVacancyResource
     {
-        return $this->service->show($id);
+        return $this->service->show($vacancy);
     }
 
     /**
@@ -208,9 +209,9 @@ class JobCatalogController extends Controller
      *      )
      *  )
      */
-    public function update(string $id, JobOperationRequest $request): JobVacancyResource
+    public function update(JobVacancy $vacancy, JobOperationRequest $request): JobVacancyResource
     {
-        return $this->service->update($id, $request);
+        return $this->service->update($vacancy, $request);
     }
 
     /**
@@ -265,9 +266,9 @@ class JobCatalogController extends Controller
      *      )
      *  )
      */
-    public function delete(string $id): Response
+    public function delete(JobVacancy $vacancy): Response
     {
-        return $this->service->delete($id);
+        return $this->service->delete($vacancy);
     }
 
     /**

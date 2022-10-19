@@ -19,11 +19,11 @@ class AddUserCoins implements ShouldQueue
     {
         $users = User::get();
         $coins_to_add = Setting::where('setting', 'coins')->first()->value;
-
+        $max_user_balance = env('MAX_USER_BALANCE');
         foreach ($users as $user) {
             $user->balance += $coins_to_add;
-            if ($user->balance > 5) {
-                $user->balance = 5;
+            if ($user->balance > $max_user_balance) {
+                $user->balance = $max_user_balance;
             }
             $user->save();
         }

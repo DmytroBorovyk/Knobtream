@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 
 use App\Models\Email;
+use App\Models\JobVacancy;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Mail;
 
 class MailService
 {
-    public function send($data, $user_id): bool
+    public function send(array $data, string $user_id): bool
     {
         $user = User::findOrFail($user_id);
 
@@ -25,7 +26,7 @@ class MailService
         }
     }
 
-    public function check($vacancy)
+    public function check(JobVacancy $vacancy)
     {
         $letter = Email::where('vacancy_id', $vacancy->id)->orderByDesc('created_at')->first();
 

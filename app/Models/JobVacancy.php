@@ -44,12 +44,17 @@ class JobVacancy extends Model
 
     public function likes(): HasMany
     {
-        return $this->hasMany(Like::class,'liked_id')->where('type', 'job');
+        return $this->hasMany(Like::class,'liked_id')->where('liked_type', 'job');
     }
 
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'vacancy_tag', 'vacancy_id', 'tag_id');
+    }
+
+    public function likedByUsers()
+    {
+        return $this->morphToMany(User::class, 'liked', 'likes');
     }
 
     public function addReviewsCount()
