@@ -6,7 +6,9 @@ namespace App\Http\Services;
 use App\Http\Requests\LikeRequest;
 use App\Http\Resources\JobVacancyResource;
 use App\Http\Resources\UserResource;
+use App\Models\JobVacancy;
 use App\Models\Like;
+use App\Models\User;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse as Response;
@@ -20,7 +22,7 @@ class LikeService
         if (in_array($request->type, $this->possible_like_types)) {
             $like = Like::where('user_id', Auth::user()->getKey())
                 ->where('liked_id', $request->liked_id)
-                ->where('type', $request->type)
+                ->where('liked_type', $request->type === 'job' ? 'App\Models\JobVacancy' : 'App\Models\User')
                 ->first();
 
             if ($like) {
@@ -32,11 +34,13 @@ class LikeService
                 ], 200);
             }
 
-            Like::create([
-                'user_id' => Auth::user()->getKey(),
-                'liked_id' => $request->liked_id,
-                'type' => $request->type,
-            ]);
+            if ($request->type == 'job') {
+                $attachable = JobVacancy::findOrFail($request->liked_id);
+            } else {
+                $attachable = User::findOrFail($request->liked_id);
+            }
+
+            $attachable->likedByUsers()->attach(Auth::user()->id);
 
             return response()->json([
                 'status' => true,
@@ -52,22 +56,11 @@ class LikeService
 
     public function getLikedJobs(): AnonymousResourceCollection
     {
-        $job_likes = Auth::user()->likes->where('type', 'job');
-        $liked_jobs = $job_likes->map(function ($item) {
-            return $item->liked_job;
-        }, []);
-
-        return JobVacancyResource::collection($liked_jobs);
+        return JobVacancyResource::collection(Auth::user()->likedJobs);
     }
 
     public function getLikedUsers(): AnonymousResourceCollection
     {
-        $user_likes = Auth::user()->likes->where('type', 'user');
-
-        $liked_users = $user_likes->map(function ($item) {
-            return $item->liked_user;
-        }, []);
-
-        return UserResource::collection($liked_users);
+        return UserResource::collection(Auth::user()->likedUsers);
     }
 }

@@ -61,6 +61,21 @@ class User extends Authenticatable
         return $this->hasMany(Like::class, 'user_id');
     }
 
+    public function likedJobs()
+    {
+        return $this->morphedByMany(JobVacancy::class, 'liked','likes');
+    }
+
+    public function likedUsers()
+    {
+        return $this->morphedByMany(User::class, 'liked', 'likes');
+    }
+
+    public function likedByUsers()
+    {
+        return $this->morphToMany(User::class, 'liked', 'likes');
+    }
+
     public function addCoins(int $amount)
     {
         $this->balance += $amount;

@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('likes', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->unsigned();
-            $table->string('liked_id');
-            $table->string('type')->default('job');
+            $table->integer('liked_id')->unsigned();
+            $table->string('liked_type')->default('job');
             $table->timestamps();
         });
 
