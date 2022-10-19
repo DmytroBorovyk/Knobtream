@@ -44,7 +44,7 @@ class JobCatalogService
         return JobVacancyResource::collection($vacancies);
     }
 
-    public function paginate($items, $page = 1, $perPage = 15,  $options = [])
+    public function paginate($items, $page = 1, $perPage = 15,  $options = []): LengthAwarePaginator
     {
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
         $items = $items instanceof Collection ? $items : Collection::make($items);
